@@ -1,0 +1,53 @@
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# Virtual environments
+# ---------------------------------------------------------------------------
+venv/
+.venv/
+env/
+.env
+
+# ---------------------------------------------------------------------------
+# Data
+#   Raw and generated data are not committed (large / re-creatable).
+#   The small, hand-written stress-test set IS committed (see the negation).
+# ---------------------------------------------------------------------------
+data/raw/
+data/processed/
+!data/stress_test.csv
+
+# ---------------------------------------------------------------------------
+# Local-only planning & assistant docs (not published to GitHub)
+#   These are working documents for the team, shared outside of git.
+#   CLAUDE.md must stay at the repo root to be auto-loaded, so it is
+#   ignored by name rather than by folder.
+# ---------------------------------------------------------------------------
+planning/
+CLAUDE.md
+
+# ---------------------------------------------------------------------------
+# Coursework / assignment materials (kept local, never published)
+#   Keep briefs, guides, the written report, and submission archives in an
+#   ignored folder so the public repository stays project-only.
+# ---------------------------------------------------------------------------
+assignment/
+*.pdf
+*.docx
+*.pptx
+*.zip
+
+# ---------------------------------------------------------------------------
+# Editor / OS
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
