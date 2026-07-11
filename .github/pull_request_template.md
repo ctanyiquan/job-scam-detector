@@ -15,9 +15,9 @@
 
 ## Checklist
 
-- [ ] Commits follow Conventional Commits and contain no automated co-author trailers
+- [ ] Commits follow Conventional Commits
 - [ ] `pytest tests/ -v` passes locally
-- [ ] Notebooks: "Restart & Run All" completes top to bottom; outputs cleared before commit
+- [ ] Notebooks: "Restart & Run All" completes top to bottom (outputs included)
 - [ ] No transformer, encoder, scaler, or vocabulary is fitted before the train/test split
 - [ ] Shared logic lives in `src/` and is imported (not copied into notebooks or `app.py`)
 - [ ] Docs updated if structure, flow, or conventions changed
