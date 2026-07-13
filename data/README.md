@@ -25,5 +25,5 @@ expect the file to be at.
 - `raw/` — the source dataset exactly as downloaded. Git-ignored.
 - `processed/` — generated intermediate data (for example `cleaned.csv`), produced by
   `02_data_preparation.ipynb`. Git-ignored.
-- `stress_test.csv` — a small, hand-written evaluation set. Committed, since it cannot
-  be regenerated.
+- `stress_test.csv` — a small, AI-generated adversarial evaluation set. Committed,
+  since it cannot be regenerated.
