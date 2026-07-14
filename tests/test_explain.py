@@ -17,8 +17,9 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from src.explain import explain_prediction
 from src.lstm_pipeline import LstmPipeline
 
-# A handful of synthetic rows, deliberately small, mirroring the shape a real Pipeline is fitted on: a
-# "text" column, one categorical column, and one passthrough flag column
+# A handful of deliberately small synthetic rows, mirroring the shape a
+# real Pipeline is fitted on: a "text" column, one categorical column,
+# and one passthrough flag column
 TRAIN_TEXTS = [
     "urgent wire transfer scam free money",
     "great senior engineer role with benefits",
@@ -30,22 +31,46 @@ TRAIN_TEXTS = [
 TRAIN_LABELS = [1, 0, 1, 0, 1, 0]
 
 
+def _build_train_frame():
+    """Return the synthetic training rows as the DataFrame shape
+    the pipeline expects."""
+    return pd.DataFrame(
+        {
+            "text": TRAIN_TEXTS,
+            "department": ["sales"] * len(TRAIN_TEXTS),
+            "flag": [0] * len(TRAIN_TEXTS),
+        }
+    )
+
+
 def _build_pipeline(classifier):
-    """Fit a tiny classical pipeline (TF-IDF text + one-hot category) on the synthetic training rows."""
-    train_df = pd.DataFrame({"text": TRAIN_TEXTS, "department": ["sales"] * len(TRAIN_TEXTS), "flag": [0] * len(TRAIN_TEXTS)})
+    """Fit a tiny classical pipeline (TF-IDF text + one-hot
+    category) on the synthetic training rows."""
     preprocessor = ColumnTransformer(
-        transformers=[("text", TfidfVectorizer(), "text"), ("categorical", OneHotEncoder(handle_unknown="ignore"), ["department"])],
+        transformers=[
+            ("text", TfidfVectorizer(), "text"),
+            (
+                "categorical",
+                OneHotEncoder(handle_unknown="ignore"),
+                ["department"],
+            ),
+        ],
         remainder="passthrough",
     )
-    pipeline = Pipeline([("preprocessor", preprocessor), ("classifier", classifier)])
-    pipeline.fit(train_df, TRAIN_LABELS)
+    pipeline = Pipeline(
+        [("preprocessor", preprocessor), ("classifier", classifier)]
+    )
+    pipeline.fit(_build_train_frame(), TRAIN_LABELS)
     return pipeline
 
 
-def test_explain_prediction_returns_word_contributions_for_logistic_regression():
-    """A fitted Logistic Regression pipeline's fraud-associated words come back with a positive contribution."""
+def test_explain_prediction_logistic_regression_word_contributions():
+    """A fitted Logistic Regression pipeline's fraud-associated
+    words come back with a positive contribution."""
     pipeline = _build_pipeline(LogisticRegression(max_iter=1000))
-    contributions = explain_prediction(pipeline, "urgent wire transfer scam", top_n=5)
+    contributions = explain_prediction(
+        pipeline, "urgent wire transfer scam", top_n=5
+    )
 
     words = [word for word, _ in contributions]
     assert len(contributions) <= 5
@@ -53,13 +78,19 @@ def test_explain_prediction_returns_word_contributions_for_logistic_regression()
 
 
 def test_explain_prediction_unwraps_calibrated_svm():
-    """A LinearSVC pipeline wrapped in CalibratedClassifierCV is unwrapped to reach its coefficients."""
+    """A LinearSVC pipeline wrapped in CalibratedClassifierCV is
+    unwrapped to reach its coefficients."""
     svm_pipeline = _build_pipeline(LinearSVC(max_iter=5000))
-    # cv=2 keeps this workable on the tiny six-row synthetic set; a real validation set is large enough for the default
-    calibrated_svm = CalibratedClassifierCV(FrozenEstimator(svm_pipeline), method="sigmoid", cv=2)
-    calibrated_svm.fit(pd.DataFrame({"text": TRAIN_TEXTS, "department": ["sales"] * len(TRAIN_TEXTS), "flag": [0] * len(TRAIN_TEXTS)}), TRAIN_LABELS)
+    # cv=2 keeps this workable on the tiny six-row synthetic set; a
+    # real validation set is large enough for the default
+    calibrated_svm = CalibratedClassifierCV(
+        FrozenEstimator(svm_pipeline), method="sigmoid", cv=2
+    )
+    calibrated_svm.fit(_build_train_frame(), TRAIN_LABELS)
 
-    contributions = explain_prediction(calibrated_svm, "urgent wire transfer scam", top_n=5)
+    contributions = explain_prediction(
+        calibrated_svm, "urgent wire transfer scam", top_n=5
+    )
 
     words = [word for word, _ in contributions]
     assert len(contributions) <= 5
@@ -67,11 +98,18 @@ def test_explain_prediction_unwraps_calibrated_svm():
 
 
 def test_explain_prediction_uses_occlusion_for_lstm_pipeline():
-    """An LstmPipeline's prediction is explained by occlusion, returning one contribution per word."""
+    """An LstmPipeline's prediction is explained by occlusion,
+    returning one contribution per word."""
     tokenizer = Tokenizer(num_words=50, oov_token="<OOV>")
     tokenizer.fit_on_texts(TRAIN_TEXTS)
 
-    model = Sequential([Embedding(input_dim=50, output_dim=8, mask_zero=True), LSTM(4), Dense(1, activation="sigmoid")])
+    model = Sequential(
+        [
+            Embedding(input_dim=50, output_dim=8, mask_zero=True),
+            LSTM(4),
+            Dense(1, activation="sigmoid"),
+        ]
+    )
     model.compile(optimizer="adam", loss="binary_crossentropy")
     model.build(input_shape=(None, 6))
 
@@ -80,4 +118,8 @@ def test_explain_prediction_uses_occlusion_for_lstm_pipeline():
     contributions = explain_prediction(lstm_pipeline, text, top_n=5)
 
     assert len(contributions) == min(5, len(text.split()))
-    assert all(isinstance(word, str) and isinstance(contribution, (int, float, np.floating)) for word, contribution in contributions)
+    assert all(
+        isinstance(word, str)
+        and isinstance(contribution, (int, float, np.floating))
+        for word, contribution in contributions
+    )
