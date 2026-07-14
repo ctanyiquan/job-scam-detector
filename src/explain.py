@@ -76,7 +76,7 @@ def _explain_via_occlusion(model, text, top_n):
     ]
 
     # Predict the baseline and every occluded variant in one batch
-    # rather than one call per word
+    # instead of one call per word
     baseline_probability = model.predict_proba([text])[0, 1]
     if occluded_texts:
         occluded_probabilities = model.predict_proba(occluded_texts)[:, 1]
