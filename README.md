@@ -4,6 +4,8 @@ A machine-learning web application that classifies a pasted job posting or recru
 message as **fraudulent** or **legitimate**, returns a confidence score, and highlights
 the words that most influenced the verdict.
 
+**Live app:** [job-scam-detector-2026.streamlit.app](https://job-scam-detector-2026.streamlit.app/)
+
 ## How it works
 
 Two models are trained and compared on the same held-out data: a classical model
@@ -41,10 +43,9 @@ given the tiny sample size, not as a formal metric.
 
 ## Project status
 
-Notebooks 01–06 are complete and the deployed model is saved at
-`models/deployed_pipeline.joblib`. The web app (`app.py`) and its hosting platform are
-still being built — this section will be updated with setup and usage instructions
-once that lands.
+Notebooks 01–06 are complete, the deployed model is saved at
+`models/deployed_pipeline.joblib`, and the web app (`app.py`) is live on Streamlit
+Community Cloud at [job-scam-detector-2026.streamlit.app](https://job-scam-detector-2026.streamlit.app/).
 
 ## Getting started (for the notebooks)
 
@@ -56,11 +57,24 @@ once that lands.
    ```
 4. Run the notebooks in order, 01 through 06, each with Restart & Run All.
 
+## Running the app locally
+
+1. Clone the repository (the committed `models/deployed_pipeline.joblib` is loaded
+   directly; the raw dataset is not needed).
+2. Create a virtual environment and install the production dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+3. From the repository root, run:
+   ```
+   streamlit run app.py
+   ```
+
 ## Tech stack
 
 Python, pandas, and scikit-learn for the classical model and data pipeline;
-TensorFlow/Keras for the LSTM; pytest for the test suite; joblib for the model
-artifact. The web app's framework and hosting platform are not yet finalised.
+TensorFlow/Keras for the LSTM; Streamlit for the web app, deployed on Streamlit
+Community Cloud; pytest for the test suite; joblib for the model artifact.
 
 ## Contributing
 
