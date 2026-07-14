@@ -12,12 +12,14 @@ def test_clean_text_lower_cases():
 
 
 def test_clean_text_strips_html_tags():
-    """HTML tags are replaced with a space, not removed outright, so words do not fuse together."""
+    """HTML tags are replaced with a space, not removed outright,
+    so words do not fuse together."""
     assert clean_text("<p>Hello</p><p>World</p>") == "hello world"
 
 
 def test_clean_text_unescapes_html_entities():
-    """HTML entities such as &amp; are unescaped before punctuation is stripped."""
+    """HTML entities such as &amp; are unescaped before
+    punctuation is stripped."""
     assert clean_text("Sales &amp; Marketing") == "sales marketing"
 
 
@@ -27,8 +29,10 @@ def test_clean_text_replaces_links():
 
 
 def test_clean_text_removes_punctuation():
-    """Punctuation and digits are removed, leaving letters and single spaces only."""
-    assert clean_text("Great job, apply now! Earn $500/day.") == "great job apply now earn day"
+    """Punctuation and digits are removed, leaving letters and
+    single spaces only."""
+    cleaned = clean_text("Great job, apply now! Earn $500/day.")
+    assert cleaned == "great job apply now earn day"
 
 
 def test_clean_text_handles_empty_string():
@@ -37,12 +41,18 @@ def test_clean_text_handles_empty_string():
 
 
 def test_combine_fields_joins_present_values():
-    """Present fields are joined with a single space, in the given field order."""
-    row = pd.Series({"title": "Analyst", "company_profile": "A great company"})
-    assert combine_fields(row, fields=["title", "company_profile"]) == "Analyst A great company"
+    """Present fields are joined with a single space, in the given
+    field order."""
+    row = pd.Series(
+        {"title": "Analyst", "company_profile": "A great company"}
+    )
+    combined = combine_fields(row, fields=["title", "company_profile"])
+    assert combined == "Analyst A great company"
 
 
 def test_combine_fields_treats_missing_as_empty():
-    """Missing values (NaN) contribute no text and no extra spaces are left behind."""
+    """Missing values (NaN) contribute no text and no extra spaces
+    are left behind."""
     row = pd.Series({"title": "Analyst", "company_profile": np.nan})
-    assert combine_fields(row, fields=["title", "company_profile"]) == "Analyst"
+    combined = combine_fields(row, fields=["title", "company_profile"])
+    assert combined == "Analyst"
